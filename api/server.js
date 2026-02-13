@@ -48,23 +48,22 @@ function getSheetId() {
 }
 
 // 2. Resolve Credentials
-// 2. Resolve Credentials
 let CREDENTIALS = null;
 if (fs.existsSync(jsonCredsPath)) {
     console.log("Loading credentials from JSON file...");
-    CREDENTIALS = JSON.parse(fs.readFileSync(jsonCredsPath, 'utf8'));
+    try {
+        CREDENTIALS = JSON.parse(fs.readFileSync(jsonCredsPath, 'utf8'));
+    } catch (e) {
+        console.error("Error parsing JSON credentials file:", e);
+    }
 } else if (process.env.GOOGLE_CREDENTIALS) {
     console.log("Loading credentials from environment variables...");
     try {
+        // Handle potential stringified JSON in env var
         CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
     } catch (e) {
-        console.error("Failed to parse GOOGLE_CREDENTIALS env var");
+        console.error("Failed to parse GOOGLE_CREDENTIALS env var:", e);
     }
-}
-
-if (!CREDENTIALS) {
-    console.error("ERROR: No Google credentials found (JSON file or .env.local)");
-    process.exit(1);
 }
 
 // Fix newline in private key
@@ -98,16 +97,30 @@ const handler = async (req, res) => {
                     res.writeHead(400); res.end(JSON.stringify({ error: 'Missing sheetId' })); return; 
                 }
 
-                // Save to localstorage.json
+                if (!CREDENTIALS) {
+                    throw new Error("Google Credentials not configured on server");
+                }
+
+                // Save to localstorage.json (Try/Catch for Vercel read-only FS)
                 const data = { SHEET_ID: sheetId, updatedAt: new Date().toISOString() };
-                fs.writeFileSync(storagePath, JSON.stringify(data, null, 2));
-                console.log(`Updated SHEET_ID in localstorage.json to: ${sheetId}`);
+                try {
+                    fs.writeFileSync(storagePath, JSON.stringify(data, null, 2));
+                    console.log(`Updated SHEET_ID in localstorage.json to: ${sheetId}`);
+                } catch (fsErr) {
+                    console.warn("Could not write to localstorage.json (expected on Vercel):", fsErr.message);
+                    // On Vercel, we can't persist files, but we can continue the request
+                }
 
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: true, message: 'Saved to localstorage.json' }));
+                res.end(JSON.stringify({ 
+                    success: true, 
+                    message: 'Sheet ID updated in session',
+                    note: 'Changes may not persist permanently on Vercel. Update Env Vars for permanent change.'
+                }));
             } catch (err) {
                 console.error("Save Error:", err);
-                res.writeHead(500); res.end(JSON.stringify({ error: 'Failed to save' }));
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: err.message || 'Failed to save configuration' }));
             }
         });
         return;
@@ -115,6 +128,15 @@ const handler = async (req, res) => {
 
     if (pathname === '/api/data') {
         try {
+            if (!CREDENTIALS) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ 
+                    error: "SERVER_NOT_CONFIGURED", 
+                    message: "Google credentials are missing. Please set GOOGLE_CREDENTIALS in Vercel Environment Variables." 
+                }));
+                return;
+            }
+
             const currentSheetId = getSheetId(); // Dynamic fetch
             
             console.log(`Using Sheet ID: ${currentSheetId}`);
