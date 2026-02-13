@@ -365,6 +365,22 @@
       transition: all 0.3s ease;
     }
 
+
+    /* Sheet Name Layout */
+    #header-sheet-name {
+      margin: 0;
+      font-size: 16px;
+      opacity: 0.8;
+      font-weight: 400;
+      border-left: 1px solid rgba(255,255,255,0.2);
+      padding-left: 12px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--white);
+      white-space: nowrap;
+    }
+
     /* Mobile Header Optimization */
     @media (max-width: 768px) {
       header {
@@ -399,7 +415,7 @@
 
       /* Hide sheet name timestamp on mobile */
       #header-sheet-name {
-        font-size: 12px;
+        font-size: 10px;
         padding-left: 8px;
         max-width: 120px;
         overflow: hidden;
@@ -455,7 +471,7 @@
       }
 
       header.header-hidden #header-sheet-name {
-        font-size: 10px; /* Smaller sheet title */
+        font-size: 8px; /* Smaller sheet title */
         max-width: 90px;
         padding-left: 8px;
         border-left: 1px solid rgba(255,255,255,0.15);
@@ -525,6 +541,8 @@
     .logo-text p {
       display: none;
     }
+
+
 
     .header-actions {
       display: flex;
@@ -1482,7 +1500,7 @@
           </svg>
           <div class="logo-text">
             <h1>SKLUM<img id="heart-settings-btn" src="icons8-heart.apng" alt="heart" style="width: 22px; height: 22px; vertical-align: baseline; position: relative; top: 2px; margin-left: 6px; filter: brightness(0) invert(1); cursor: pointer; transition: all 0.3s ease;"></h1>
-            <span id="header-sheet-name" style="margin: 0; font-size: 16px; opacity: 0.8; font-weight: 400; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 12px; height: 20px; display: inline-flex; align-items: center; color: var(--white); white-space: nowrap;">Loading...</span>
+            <span id="header-sheet-name">Loading...</span>
           </div>
         </div>
         
