@@ -441,20 +441,24 @@
 
       /* Compact header when scrolled */
       header.header-hidden {
-        padding: 6px 0;
+        padding: 4px 0;
       }
 
       header.header-hidden .header-content {
-        padding: 0 12px;
+        padding: 0 8px; /* Two sides alignment - reduced padding */
+        width: 100%;
+        justify-content: space-between;
       }
 
       header.header-hidden .logo-text h1 {
-        font-size: 14px;
+        font-size: 13px; /* Smaller logo text */
       }
 
       header.header-hidden #header-sheet-name {
-        font-size: 11px;
-        max-width: 100px;
+        font-size: 10px; /* Smaller sheet title */
+        max-width: 90px;
+        padding-left: 8px;
+        border-left: 1px solid rgba(255,255,255,0.15);
       }
     }
 
@@ -1277,20 +1281,7 @@
         position: relative;
       }
 
-      /* Horizontal scroll indicator */
-      .table-wrapper::after {
-        content: '→ Swipe to see more';
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        background: linear-gradient(90deg, transparent, rgba(0,0,0,0.8));
-        padding: 8px 12px;
-        font-size: 10px;
-        color: rgba(255,255,255,0.6);
-        pointer-events: none;
-        border-radius: 4px 0 0 4px;
-      }
+
       
       table {
         min-width: 600px; /* Force horizontal scroll for readability */
