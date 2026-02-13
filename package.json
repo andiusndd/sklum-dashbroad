@@ -1,0 +1,16 @@
+{
+  "name": "sklum-dashboard-standalone",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lightweight SKLUM Dashboard using Pure HTML/JS and Node.js proxy for Google Sheets",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "googleapis": "^171.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

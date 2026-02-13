@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKLUM Dashboard - Black & White</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Pure Black & White Grayscale System */
+      --black: #000000;
+      --gray-900: #1a1a1a;
+      --gray-800: #2a2a2a;
+      --gray-700: #3a3a3a;
+      --gray-600: #666666;
+      --gray-500: #808080;
+      --gray-400: #999999;
+      --gray-300: #b3b3b3;
+      --gray-200: #cccccc;
+      --gray-100: #e6e6e6;
+      --gray-50: #f5f5f5;
+      --white: #ffffff;
+      
+      /* Glass Effects */
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      
+      /* Typography */
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* Custom Grayscale Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Firefox Scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      font-family: var(--font-main);
+      background: var(--gray-900);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background */
+    .tech-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      background: var(--gray-900);
+      background-size: cover;
+      background-position: center;
+      transition: background-image 1s ease-in-out;
+    }
+
+    #bg-video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+    }
+
+    #bg-video.loaded {
+      opacity: 1;
+    }
+
+    .tech-background::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0);
+      transition: background 0.4s ease;
+      z-index: 1; /* Overlay on video */
+      pointer-events: none;
+    }
+
+    /* Darkened state */
+    .tech-background.darkened::before {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .grid-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 2; /* Ensure grid is on top */
+    }
+
+    /* Content Layer */
+    .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+
+    /* Header */
+    header {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 12px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    header.header-hidden {
+      padding: 10px 0;
+      background: rgba(20, 20, 20, 0.7); /* Darker glass for better contrast in shrunk state */
+      backdrop-filter: blur(25px) saturate(200%);
+      -webkit-backdrop-filter: blur(25px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    /* Simplified Hidden State Logic: Keep elements aligned with container */
+    header.header-hidden .logo-text h1 {
+      font-size: 18px;
+      display: inline;
+      line-height: 1;
+    }
+
+    header.header-hidden .logo-text p {
+      display: inline;
+      font-size: 18px;
+      font-weight: 300;
+      opacity: 0.8;
+    }
+
+    header.header-hidden .last-updated {
+      font-size: 13px;
+      color: var(--white);
+    }
+
+    header.header-hidden .live-dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    header.header-hidden .toggle-text {
+      display: inline;
+      color: var(--white);
+    }
+
+    header.header-hidden .dark-toggle img {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Ultra-wide screens: Push info to corners when scrolling */
+    @media (min-width: 1600px) {
+      header.header-hidden {
+        background: transparent;
+        backdrop-filter: none;
+        border-bottom: none;
+        box-shadow: none;
+        pointer-events: none;
+      }
+
+      header.header-hidden .header-content {
+        max-width: none;
+        width: 100%;
+        padding: 0;
+      }
+
+      header.header-hidden .logo {
+        position: fixed;
+        left: 48px;
+        top: 36px;
+        z-index: 101;
+        pointer-events: auto;
+        padding: 0;
+        background: none;
+        backdrop-filter: none;
+        border: none;
+      }
+
+      header.header-hidden .header-actions {
+        position: fixed;
+        display: flex; /* Ensure flex behavior */
+        right: 48px;
+        top: 36px;
+        z-index: 101;
+        pointer-events: auto;
+        padding: 0; /* No padding as requested */
+        background: none; /* No background as requested */
+        backdrop-filter: none;
+        border: none; /* No border as requested */
+        flex-direction: column;
+        align-items: flex-end; /* Align all items to the right */
+        gap: 12px; /* Slight increase for better vertical spacing */
+      }
+      
+      header.header-hidden .media-group {
+          display: flex;
+          flex-direction: row; /* Horizontal row for media controller */
+          align-items: center;
+          gap: 16px;
+      }
+
+      header.header-hidden .media-toggle,
+      header.header-hidden .nav-btn,
+      header.header-hidden .dark-toggle {
+          margin: 0 !important;
+          width: auto; /* Reset width for horizontal group */
+          justify-content: flex-end; /* Align content to right */
+          border-radius: 8px; /* Reset circular radius */
+          padding: 8px 12px;
+          transition: background 0.3s ease, opacity 0.3s ease;
+      }
+
+      header.header-hidden .media-toggle:hover,
+      header.header-hidden .dark-toggle:hover {
+          background: none; /* Removed background */
+          opacity: 0.7;
+      }
+
+      header.header-hidden .nav-btn:hover {
+          background: none; /* Hidden background on hover for nav buttons */
+          opacity: 0.6; /* Slight dim instead of background box */
+      }
+      
+      header.header-hidden .toggle-text {
+        display: inline-block; /* Force show text in this mode */
+        margin-left: 8px;
+        font-size: 10px;
+        letter-spacing: 1px;
+        font-weight: 600;
+         color: var(--white);
+      }
+
+      header.header-hidden .logo-text h1 {
+        font-size: 20px;
+        display: block;
+      }
+
+      header.header-hidden .logo-text p {
+        display: block;
+        font-size: 10px;
+      }
+
+      header.header-hidden .last-updated {
+        display: flex; /* Bring back updated time for wide screens */
+      }
+    }
+
+    /* Fixed alignment for standard screens */
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        padding: 0 24px;
+      }
+    }
+
+    header.header-hidden .logo-icon {
+      display: none;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      display: none;
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text p {
+      font-size: 10px;
+      color: var(--white);
+      opacity: 0.7;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .header-actions, .media-group {
+      display: flex;
+      align-items: center;
+      gap: clamp(12px, 2vw, 24px);
+    }
+    
+    .last-updated {
+      font-size: 13px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 400;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--white);
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+
+    .dark-toggle, .media-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .dark-toggle:hover, .media-toggle:hover {
+      opacity: 0.7;
+      background: none; /* Removed background */
+    }
+    
+    .nav-btn:hover {
+      opacity: 0.7;
+      background: none; /* Removed background as requested */
+    }
+    
+    .nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      transition: opacity 0.3s ease;
+      border-radius: 50%;
+    }
+    
+    .nav-btn:hover {
+      background: none;
+    }
+
+    /* Main Content */
+    main {
+      padding: 48px 0;
+    }
+
+    .section {
+      margin-bottom: 60px;
+    }
+
+    /* Metric Cards */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .metric-card {
+      aspect-ratio: 1 / 1;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--glass-shadow);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+
+    .metric-card:hover {
+      border-color: var(--white);
+    }
+
+
+    .metric-icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: var(--gray-300);
+      font-weight: 400;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .metric-value {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--white);
+    }
+
+    .metric-trend {
+      font-size: 13px;
+      color: var(--gray-400);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 300;
+    }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 24px;
+    }
+
+    .chart-card {
+      aspect-ratio: 1 / 1;
+      background: rgba(255, 255, 255, 0.08); /* Slightly more solid to prevent background details bleeding through */
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--glass-shadow);
+      transition: border-color 0.3s ease, transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-card:hover {
+      border-color: var(--white);
+    }
+
+    .chart-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--white);
+      letter-spacing: -0.5px;
+      flex-shrink: 0;
+    }
+
+    .chart-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    /* Donut Chart */
+    .donut-chart {
+      position: relative;
+      width: 240px;
+      height: 240px;
+      margin: 0 auto;
+    }
+
+    .legend {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--gray-300);
+      font-weight: 300;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+
+    /* Bar Chart */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: clamp(8px, 2vw, 16px);
+      height: 240px; /* Increased height for square card layout */
+      padding: 0 16px;
+      width: 100%;
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    .bar {
+      flex: 1;
+      min-width: 40px;
+      background: linear-gradient(180deg, var(--white) 0%, var(--gray-300) 100%);
+      border-radius: 12px 12px 0 0;
+      min-height: 30px;
+      transition: all 0.4s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .bar:hover {
+      filter: brightness(1.2);
+      transform: scaleY(1.05);
+    }
+
+    .bar-label {
+      position: absolute;
+      bottom: -28px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: clamp(9px, 1.5vw, 11px);
+      color: var(--gray-400);
+      font-weight: 300;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 2px;
+    }
+
+    .bar-value {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: clamp(11px, 2vw, 14px);
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    /* Table */
+    .table-card {
+      aspect-ratio: 2 / 1;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--glass-shadow);
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Custom scrollbar for table-card */
+    .table-card::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .table-card::-webkit-scrollbar-track {
+      background: transparent;
+      margin: 24px 0; /* Align with border-radius */
+    }
+
+    .table-card::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      border: 2px solid transparent; /* Creates a gap effect */
+      background-clip: content-box;
+    }
+
+    .table-card::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+      background-clip: content-box;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--white);
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--gray-300);
+      font-weight: 300;
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-bar {
+      width: 100px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--white) 0%, var(--gray-300) 100%);
+      transition: width 0.3s;
+    }
+
+    .toggle-text {
+      display: none;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-left: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-card, .table-card {
+        aspect-ratio: 16 / 9;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 20px;
+      }
+
+      header.header-hidden .container {
+        padding: 0 16px;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .metric-card {
+        padding: 20px;
+      }
+
+      .metric-value {
+        font-size: 28px;
+      }
+
+      .logo-text h1 {
+        font-size: 16px;
+      }
+
+      .chart-card, .table-card {
+        padding: 24px;
+        aspect-ratio: auto;
+        min-height: 350px;
+      }
+      
+      .table-card {
+        overflow-x: auto;
+      }
+      
+      table {
+        min-width: 600px; /* Force horizontal scroll for readability */
+      }
+
+      .header-actions .last-updated {
+        display: none; /* Hide timestamp on mobile to save space */
+      }
+    }
+
+    @media (max-width: 480px) {
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 0 16px;
+      }
+      
+      .metric-value {
+        font-size: 36px;
+      }
+      
+      .logo-text p {
+        display: none; /* Hide 'Dashboard' text on very small screens if needed */
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background -->
+  <div class="tech-background">
+    <video id="bg-video" autoplay muted loop playsinline></video>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <!-- Header -->
+    <header>
+      <div class="container header-content">
+        <div class="logo">
+          <!-- B&W Logo -->
+          <svg class="logo-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="12" fill="white" opacity="0.2"/>
+            <path d="M12 34V20L18 16L24 24L30 14L36 18V34H12Z" fill="white" opacity="0.8"/>
+            <circle cx="18" cy="16" r="2.5" fill="#ffffff"/>
+            <circle cx="24" cy="24" r="2.5" fill="#cccccc"/>
+            <circle cx="30" cy="14" r="2.5" fill="#999999"/>
+            <circle cx="36" cy="18" r="2.5" fill="#cccccc"/>
+          </svg>
+          <div class="logo-text">
+            <h1>SKLUM</h1>
+            <p>Dashboard</p>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <div class="last-updated">
+            <span class="live-dot"></span>
+            <span>Live • Updated 30s ago</span>
+          </div>
+          <div class="media-group">
+            <button class="nav-btn prev-media" title="Previous Background">
+              <img src="https://img.icons8.com/liquid-glass/96/back.png" width="20" height="20" alt="Prev">
+              <span class="toggle-text">PREV</span>
+            </button>
+            
+            <button class="media-toggle">
+              <img src="https://img.icons8.com/liquid-glass/96/play.png" 
+                   onerror="this.src='https://img.icons8.com/fluency/96/play.png'" 
+                   alt="Toggle Media" width="24" height="24">
+              <span class="toggle-text">VIDEO</span>
+            </button>
+
+            <button class="nav-btn next-media" title="Next Background">
+              <img src="https://img.icons8.com/liquid-glass/96/forward.png" width="20" height="20" alt="Next">
+              <span class="toggle-text">NEXT</span>
+            </button>
+          </div>
+          <button class="dark-toggle">
+            <img src="https://img.icons8.com/liquid-glass/96/sun.png" 
+                 onerror="this.src='https://img.icons8.com/fluency/96/sun.png'" 
+                 alt="Toggle Theme" width="24" height="24">
+            <span class="toggle-text">LIGHT</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main>
+      <div class="container">
+        <!-- Metric Cards -->
+        <section class="section">
+          <div class="metric-grid">
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/bar-chart.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/bar-chart.png'" 
+                     alt="Total Tasks" width="48" height="48">
+              </div>
+              <div class="metric-label">Total Tasks</div>
+              <div class="metric-value">145</div>
+              <div class="metric-trend">↑ +12 this week</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/in-progress.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/synchronize.png'" 
+                     alt="In Progress" width="48" height="48">
+              </div>
+              <div class="metric-label">In Progress</div>
+              <div class="metric-value">32</div>
+              <div class="metric-trend">↓ -3 from last</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/task-completed.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/checked.png'" 
+                     alt="Completed" width="48" height="48">
+              </div>
+              <div class="metric-label">Completed</div>
+              <div class="metric-value">98</div>
+              <div class="metric-trend">↑ +15 this week</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/overdue.png" 
+                     onerror="this.src='https://img.icons8.com/liquid-glass/48/error.png'" 
+                     alt="Overdue" width="48" height="48">
+              </div>
+              <div class="metric-label">Overdue</div>
+              <div class="metric-value">15</div>
+              <div class="metric-trend">↑ +2 this week</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts -->
+        <section class="section">
+          <div class="charts-grid">
+            <!-- Donut Chart -->
+            <div class="chart-card">
+              <h3 class="chart-title">Task Status Distribution</h3>
+              <div class="chart-content">
+                <svg class="donut-chart" viewBox="0 0 200 200">
+                  <defs>
+                    <linearGradient id="grad-done" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#cccccc;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="grad-progress" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#cccccc;stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#999999;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="grad-todo" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:#999999;stop-opacity:0.7" />
+                      <stop offset="100%" style="stop-color:#666666;stop-opacity:0.7" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="url(#grad-done)" stroke-width="35" 
+                          stroke-dasharray="295 440" transform="rotate(-90 100 100)"/>
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="url(#grad-progress)" stroke-width="35" 
+                          stroke-dasharray="97 440" stroke-dashoffset="-295" transform="rotate(-90 100 100)"/>
+                  <circle cx="100" cy="100" r="70" fill="none" stroke="url(#grad-todo)" stroke-width="35" 
+                          stroke-dasharray="48 440" stroke-dashoffset="-392" transform="rotate(-90 100 100)"/>
+                </svg>
+                <div class="legend">
+                  <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #ffffff, #cccccc);"></div>
+                    <span>Done (98)</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #cccccc, #999999);"></div>
+                    <span>In Progress (32)</span>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #999999, #666666);"></div>
+                    <span>To Do (15)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bar Chart -->
+            <div class="chart-card">
+              <h3 class="chart-title">Tasks by Milestone</h3>
+              <div class="chart-content">
+                <div class="bar-chart">
+                  <div class="bar" style="height: 66%;">
+                    <div class="bar-value">45</div>
+                    <div class="bar-label">Planning</div>
+                  </div>
+                  <div class="bar" style="height: 47%;">
+                    <div class="bar-value">32</div>
+                    <div class="bar-label">Design</div>
+                  </div>
+                  <div class="bar" style="height: 100%;">
+                    <div class="bar-value">68</div>
+                    <div class="bar-label">Dev</div>
+                  </div>
+                  <div class="bar" style="height: 34%;">
+                    <div class="bar-value">23</div>
+                    <div class="bar-label">Testing</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Table -->
+        <section class="section">
+          <div class="table-card">
+            <h3 class="chart-title" style="margin-bottom: 24px;">All Tasks</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Task Name</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>Assignee</th>
+                  <th>Due Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Website Redesign</td>
+                  <td><span class="status-badge">In Progress</span></td>
+                  <td>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                  </td>
+                  <td>John Doe</td>
+                  <td>Feb 15, 2026</td>
+                </tr>
+                <tr>
+                  <td>Mobile App Launch</td>
+                  <td><span class="status-badge">Done</span></td>
+                  <td>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                  </td>
+                  <td>Jane Smith</td>
+                  <td>Feb 10, 2026</td>
+                </tr>
+                <tr>
+                  <td>API Integration</td>
+                  <td><span class="status-badge">In Progress</span></td>
+                  <td>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 45%;"></div>
+                    </div>
+                  </td>
+                  <td>Mike Johnson</td>
+                  <td>Feb 20, 2026</td>
+                </tr>
+                <tr>
+                  <td>Database Migration</td>
+                  <td><span class="status-badge">To Do</span></td>
+                  <td>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                  </td>
+                  <td>Sarah Lee</td>
+                  <td>Feb 25, 2026</td>
+                </tr>
+                <tr>
+                  <td>User Testing</td>
+                  <td><span class="status-badge">Done</span></td>
+                  <td>
+                    <div class="progress-bar">
+                      <div class="progress-fill" style="width: 100%;"></div>
+                    </div>
+                  </td>
+                  <td>Tom Wilson</td>
+                  <td>Feb 8, 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+<script>
+// Video & Image Background System
+const videos = [
+  // Verified Pixabay Nature Loops (High Reliability)
+  'https://cdn.pixabay.com/video/2024/12/04/244839_large.mp4',       // Dark Waves
+  'https://cdn.pixabay.com/video/2021/09/11/88207-602915574_large.mp4',  // Sunset Clouds
+  'https://cdn.pixabay.com/video/2020/04/24/37088-413229662_large.mp4',  // Tropical Waterfall
+  'https://cdn.pixabay.com/video/2023/11/12/188778-883818276_large.mp4', // Winter Snow
+  'https://cdn.pixabay.com/video/2019/03/18/22070-325253460_large.mp4',  // Storm Clouds
+  
+  // New Drone/Flycam Nature Videos
+  'https://cdn.pixabay.com/video/2026/01/19/328740_large.mp4',       // Alps Sunrise Fog (Drone)
+  'https://cdn.pixabay.com/video/2023/04/30/161071-822582138_large.mp4', // Forest River Aerial
+  'https://cdn.pixabay.com/video/2018/01/10/13772-251867974_large.mp4',  // Surfer Coast (Drone)
+  'https://cdn.pixabay.com/video/2024/06/10/216058_large.mp4',       // Coastal Nature (Drone)
+  'https://cdn.pixabay.com/video/2023/04/28/160767-822213540_large.mp4', // Ocean Beach Waves (Drone)
+  'https://cdn.pixabay.com/video/2026/01/02/325502_large.mp4',       // Winter Snow Nature (Drone)
+
+  // Pexels Selection (Previous)
+  'https://videos.pexels.com/video-files/1409899/1409899-hd_1920_1080_25fps.mp4',
+];
+
+const backups = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
+  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80',
+  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80',
+  'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1920&q=80',
+  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80'
+];
+
+const videoElement = document.getElementById('bg-video');
+const techBg = document.querySelector('.tech-background');
+
+// 1. Set fallback image immediately
+const randomImg = backups[Math.floor(Math.random() * backups.length)];
+techBg.style.backgroundImage = `url('${randomImg}')`;
+
+// 2. Attempt to load video
+const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+videoElement.src = randomVideo;
+
+videoElement.addEventListener('playing', () => {
+  videoElement.classList.add('loaded');
+});
+
+// 3. Fallback handle
+videoElement.onerror = () => {
+  console.log('Video failed to load, keeping image background.');
+  videoElement.style.display = 'none';
+};
+
+// Dark Toggle Functionality
+const darkToggle = document.querySelector('.dark-toggle');
+const toggleIcon = darkToggle.querySelector('img');
+
+// Load saved state
+const isDarkened = localStorage.getItem('background-darkened') === 'true';
+const toggleText = darkToggle.querySelector('.toggle-text');
+
+if (isDarkened) {
+  techBg.classList.add('darkened');
+  toggleIcon.src = 'https://img.icons8.com/liquid-glass/96/moon-symbol.png';
+  toggleIcon.onerror = () => toggleIcon.src = 'https://img.icons8.com/fluency/96/moon-symbol.png';
+  toggleText.textContent = 'DARK';
+}
+
+// Toggle darkness on click
+darkToggle.addEventListener('click', () => {
+  const isCurrentlyDark = techBg.classList.toggle('darkened');
+  
+  // Save state
+  localStorage.setItem('background-darkened', isCurrentlyDark);
+  
+  // Change icon and text
+  if (isCurrentlyDark) {
+    toggleIcon.src = 'https://img.icons8.com/liquid-glass/96/moon-symbol.png';
+    toggleIcon.onerror = () => toggleIcon.src = 'https://img.icons8.com/fluency/96/moon-symbol.png';
+    toggleText.textContent = 'DARK';
+  } else {
+    toggleIcon.src = 'https://img.icons8.com/liquid-glass/96/sun.png';
+    toggleIcon.onerror = () => toggleIcon.src = 'https://img.icons8.com/fluency/96/sun.png';
+    toggleText.textContent = 'LIGHT';
+  }
+});
+
+// Media Toggle Functionality
+const mediaToggle = document.querySelector('.media-toggle');
+const mediaIcon = mediaToggle.querySelector('img');
+const mediaText = mediaToggle.querySelector('.toggle-text');
+let isVideoPlaying = true;
+
+mediaToggle.addEventListener('click', () => {
+  if (isVideoPlaying) {
+    // Pause Video (Show Image)
+    videoElement.style.opacity = '0';
+    setTimeout(() => {
+      if(videoElement.style.opacity === '0') videoElement.pause();
+    }, 1500); // Stop after fade out
+    
+    mediaIcon.src = 'https://img.icons8.com/liquid-glass/96/image.png';
+    mediaIcon.onerror = () => mediaIcon.src = 'https://img.icons8.com/fluency/96/image.png';
+    mediaText.textContent = 'IMAGE';
+    isVideoPlaying = false;
+  } else {
+    // Play Video
+    videoElement.play();
+    videoElement.style.opacity = '1';
+    
+    mediaIcon.src = 'https://img.icons8.com/liquid-glass/96/play.png';
+    mediaIcon.onerror = () => mediaIcon.src = 'https://img.icons8.com/fluency/96/play.png';
+    mediaText.textContent = 'VIDEO';
+    isVideoPlaying = true;
+  }
+});
+
+// Next/Previous Media Functionality
+const prevBtn = document.querySelector('.prev-media');
+const nextBtn = document.querySelector('.next-media');
+let currentVideoIndex = Math.floor(Math.random() * videos.length);
+let currentImageIndex = Math.floor(Math.random() * backups.length);
+
+function updateMedia(direction) {
+  // Fade out current media
+  videoElement.style.opacity = '0';
+  
+  setTimeout(() => {
+    if (isVideoPlaying) {
+      // Update Video
+      if (direction === 'next') {
+        currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+      } else {
+        currentVideoIndex = (currentVideoIndex - 1 + videos.length) % videos.length;
+      }
+      videoElement.src = videos[currentVideoIndex];
+      videoElement.play();
+    } else {
+      // Update Image
+      if (direction === 'next') {
+        currentImageIndex = (currentImageIndex + 1) % backups.length;
+      } else {
+        currentImageIndex = (currentImageIndex - 1 + backups.length) % backups.length;
+      }
+      techBg.style.backgroundImage = `url('${backups[currentImageIndex]}')`;
+    }
+    
+    // Fade in new media
+    setTimeout(() => {
+      videoElement.style.opacity = isVideoPlaying ? '1' : '0';
+    }, 100);
+  }, 500); // Wait for fade out
+}
+
+prevBtn.addEventListener('click', () => updateMedia('prev'));
+nextBtn.addEventListener('click', () => updateMedia('next'));
+
+// Auto-hide Header on Scroll
+const header = document.querySelector('header');
+let lastScrollTop = 0;
+let scrollThreshold = 100; // Start hiding after 100px scroll
+
+window.addEventListener('scroll', () => {
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  
+  // Only show normal header at the absolute top of the page
+  if (scrollTop <= 0) {
+    header.classList.remove('header-hidden');
+  } else {
+    header.classList.add('header-hidden');
+  }
+  
+  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+}, false);
+</script>
+</html>
