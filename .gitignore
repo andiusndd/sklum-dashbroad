@@ -48,3 +48,11 @@ next-env.d.ts
 
 # agent
 .agent/
+
+# Vercel Helpers
+VERCEL_COPY_PASTE.txt
+import.env
+push_fix_error.log
+push_error_final.log
+push_error.log
+push_error_attempt2.log
