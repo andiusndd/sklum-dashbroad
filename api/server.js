@@ -5,9 +5,9 @@ const { google } = require('googleapis');
 
 // 1. Load Environment Variables & Local Storage
 let env = {};
-const envPath = path.join(__dirname, '.env.local');
-const storagePath = path.join(__dirname, 'localstorage.json');
-const jsonCredsPath = path.join(__dirname, 'divine-glazing-451115-a0-f69d04cbf7ee.json');
+const envPath = path.join(__dirname, '..', '.env.local');
+const storagePath = path.join(__dirname, '..', 'localstorage.json');
+const jsonCredsPath = path.join(__dirname, '..', 'divine-glazing-451115-a0-f69d04cbf7ee.json');
 
 // Helper to get current Sheet ID with priority: localstorage.json > .env.local > Default
 function getSheetId() {
@@ -191,7 +191,7 @@ const handler = async (req, res) => {
     let contentType = 'text/html';
 
     if (pathname === '/' || pathname === '/index.html') {
-        filePath = path.join(__dirname, 'index.html');
+        filePath = path.join(__dirname, '..', 'index.html');
     } else {
         // Simple Static File Server
         const extname = path.extname(pathname).toLowerCase();
@@ -207,7 +207,7 @@ const handler = async (req, res) => {
         };
 
         if (supportedExtensions[extname]) {
-            filePath = path.join(__dirname, pathname.substring(1));
+            filePath = path.join(__dirname, '..', pathname.substring(1));
             contentType = supportedExtensions[extname];
         }
     }
