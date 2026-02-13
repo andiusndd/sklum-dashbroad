@@ -461,9 +461,17 @@
       }
 
       header.header-hidden .header-content {
-        padding: 0 8px; /* Two sides alignment - reduced padding */
-        width: 100%;
-        justify-content: space-between;
+        padding: 0 20px !important; /* Align with cards below */
+        width: 100% !important;
+        justify-content: space-between !important;
+        max-width: none !important;
+      }
+
+      header.header-hidden .logo,
+      header.header-hidden .logo-text {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        gap: 6px !important; /* Tighter gap */
       }
 
       header.header-hidden .logo-text h1 {
@@ -481,7 +489,7 @@
     /* Extra small screens */
     @media (max-width: 480px) {
       .header-content {
-        padding: 0 12px;
+        padding: 0 20px;
       }
 
       .logo-text h1 {
