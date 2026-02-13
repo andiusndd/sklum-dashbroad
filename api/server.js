@@ -61,12 +61,17 @@ app.get('/api/data', async (req, res) => {
 
         const headers = rows[0];
         const data = rows.slice(1)
-            .filter(row => row.length > 0 && (row[0] || row[3]))
+            .filter(row => row.length > 0 && row.some(cell => cell && cell.trim() !== '')) // More lenient filter: any cell has data
             .map(row => {
                 const obj = {};
                 headers.forEach((header, index) => {
                     if (!header) return;
-                    const key = header.toLowerCase().trim().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+                    // Normalize header key (remove accents/diacritics)
+                    const key = header.toLowerCase()
+                        .trim()
+                        .replace(/\s+/g, '_')
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                        .replace(/[^a-z0-9_]/g, ''); 
                     obj[key] = row[index] || '';
                 });
                 return obj;
