@@ -725,12 +725,12 @@
 
     #donut-card {
       grid-column: span 2; /* 2/5 columns */
-      min-height: 450px;
+      min-height: 480px;
     }
 
     #bar-card {
       grid-column: span 3; /* 3/5 columns */
-      min-height: 450px;
+      min-height: 480px;
     }
 
     #donut-card .legend {
@@ -780,13 +780,14 @@
       position: relative;
       width: 100%;
       height: 100%;
-      max-width: min(100%, 340px);
-      max-height: min(100%, 340px);
       aspect-ratio: 1 / 1;
       margin: 0 auto;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 1;
-      min-height: 150px;
+      min-height: 180px;
+      max-height: 380px; /* Slight cap for very large screens to maintain proportion */
     }
 
     .donut-total {
@@ -903,12 +904,13 @@
     @media (max-width: 600px) {
       #donut-card .chart-content {
         flex-direction: column;
-        padding: 10px;
+        padding: 5px;
       }
       
       #donut-card .donut-chart {
-        width: 180px;
-        height: 180px;
+        width: 100%;
+        max-width: 220px;
+        height: auto;
       }
     }
 
@@ -935,16 +937,16 @@
       border-radius: 4px;
     }
 
-    /* Bar Chart (Horizontal) */
+    /* Bar Chart (Horizontal) - Smart Scaling */
     .bar-chart {
       display: flex;
       flex-direction: column;
-      justify-content: center; /* Vercally center the group of bars */
-      gap: clamp(8px, 1.2vh, 20px);
+      justify-content: space-evenly; /* Better spacing for variable heights */
+      gap: 12px;
       width: 100%;
       height: 100%;
-      padding: 10px 0;
-      overflow-y: auto;
+      padding: 15px 0;
+      flex: 1;
     }
 
     .bar-row {
