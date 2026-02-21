@@ -632,7 +632,7 @@
     /* Metric Cards */
     .metric-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr); /* 4 columns for 4 metrics */
+      grid-template-columns: repeat(3, 1fr); /* 3 columns for 6 metrics (2 rows) */
       gap: 24px;
     }
 
@@ -656,6 +656,7 @@
 
     .metric-card:hover {
       border-color: var(--white);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     }
 
 
@@ -1353,7 +1354,7 @@
     @media (max-width: 480px) {
       /* Keep 2-column grid with square cards */
       .metric-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr); /* Back to 2 columns for smart scaling */
         gap: 12px;
       }
 
@@ -1551,25 +1552,12 @@
               <div class="metric-icon">
                 <img src="https://img.icons8.com/liquid-glass/96/bar-chart.png" 
                      onerror="this.src='https://img.icons8.com/fluency/96/bar-chart.png'" 
-                     alt="Total Tasks" width="48" height="48">
+                     alt="All Tasks" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Total Tasks</div>
-                <div class="metric-value">145</div>
-                <div class="metric-trend">↑ +12 this week</div>
-              </div>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-icon">
-                <img src="https://img.icons8.com/liquid-glass/96/in-progress.png" 
-                     onerror="this.src='https://img.icons8.com/fluency/96/synchronize.png'" 
-                     alt="In Progress" width="48" height="48">
-              </div>
-              <div class="metric-info">
-                <div class="metric-label">In Progress</div>
-                <div class="metric-value">32</div>
-                <div class="metric-trend">↓ -3 from last</div>
+                <div class="metric-label">All Tasks</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 new</div>
               </div>
             </div>
 
@@ -1577,25 +1565,64 @@
               <div class="metric-icon">
                 <img src="https://img.icons8.com/liquid-glass/96/task-completed.png" 
                      onerror="this.src='https://img.icons8.com/fluency/96/checked.png'" 
-                     alt="Completed" width="48" height="48">
+                     alt="Hoàn thành" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Completed</div>
-                <div class="metric-value">98</div>
-                <div class="metric-trend">↑ +15 this week</div>
+                <div class="metric-label">Hoàn thành</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 new</div>
               </div>
             </div>
 
             <div class="metric-card">
               <div class="metric-icon">
-                <img src="https://img.icons8.com/liquid-glass/96/overdue.png" 
-                     onerror="this.src='https://img.icons8.com/liquid-glass/48/error.png'" 
-                     alt="Overdue" width="48" height="48">
+                <img src="https://img.icons8.com/liquid-glass/96/in-progress.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/synchronize.png'" 
+                     alt="Đang thực hiện" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Waitting</div>
+                <div class="metric-label">Đang thực hiện</div>
                 <div class="metric-value">0</div>
-                <div class="metric-trend">↑ +2 this week</div>
+                <div class="metric-trend">0 new</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/search.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/search.png'" 
+                     alt="Sẵn sàng check" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Sẵn sàng check</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 new</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/todo-list.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/todo-list.png'" 
+                     alt="Chưa bắt đầu" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Chưa bắt đầu</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 new</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon">
+                <img src="https://img.icons8.com/liquid-glass/96/comments.png" 
+                     onerror="this.src='https://img.icons8.com/fluency/96/comments.png'" 
+                     alt="Feedback" width="48" height="48">
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Feedback</div>
+                <div class="metric-value">0</div>
+                <div class="metric-trend">0 feedback</div>
               </div>
             </div>
           </div>
@@ -1971,59 +1998,33 @@ async function initDashboard() {
     // Process Data
     const summary = {
       total: tasks.length,
-      inProgress: 0,
-      done: 0,
-      overdue: 0
+      hoanThanh: 0,
+      dangThucHien: 0,
+      sanSangCheck: 0,
+      chuaBatDau: 0,
+      feedback: 0
     };
 
-    // Normalizing logic for table rows
     const normalizedTasks = tasks.map(t => {
-      // Primary mapping based on the headers found:
-      // J (9): Trạng thái -> trang_thai
-      // D (3): SKU -> sku
-      // I (8): Modeler -> modeler
-      // R (17): Ngày Accepted -> ngay_accepted
-      
       const task = {
         name: t.model_id || t.sku || t.collection || t.task_name || 'Untitled',
         status: t.trang_thai || t.status || t.state || 'Unknown',
+        feedback_status: t.giai_doan_feedback || t.feedback || '',
         progress: t.progress || t.tien_do || t.percent || '0%',
         assignee: t.modeler || t.assignee || t.nguoi_thuc_hien || 'Unassigned',
         date: t.ngay_accepted || t.ngay_gui_l1 || t.due_date || t.han_chot || 'TBD'
       };
 
-      const statusLower = task.status.toLowerCase();
+      const s = task.status.toLowerCase();
       
-      // Done/Accepted
-      if (statusLower.includes('done') || 
-          statusLower.includes('accepted') || 
-          statusLower.includes('hoan thanh') || 
-          statusLower.includes('hoàn thành') || 
-          statusLower.includes('finish') ||
-          statusLower.includes('xong')) {
-        summary.done++;
-        if(task.progress === '0%') task.progress = '100%'; // Auto-fill progress if done
-      } 
-      else if (statusLower.includes('progress') || 
-               statusLower.includes('doing') || 
-               statusLower.includes('dang') || 
-               statusLower.includes('đang') || 
-               statusLower.includes('processing') ||
-               statusLower.includes('thuc hien') || 
-               statusLower.includes('thực hiện') ||
-               statusLower.includes('san sang check') ||
-               statusLower.includes('sẵn sàng check')) {
-        summary.inProgress++;
-        if(task.progress === '0%') {
-           task.progress = (statusLower.includes('check')) ? '90%' : '50%';
-        }
-      }
-      // Not Started -> Overdue Slot
-      else if (statusLower.includes('chua bat dau') || 
-               statusLower.includes('chưa bắt đầu') ||
-               statusLower.includes('todo')) {
-        summary.overdue++;
-      }
+      // Map Column J (Trạng thái)
+      if (s.includes('hoan thanh') || s.includes('hoàn thành')) summary.hoanThanh++;
+      else if (s.includes('dang thuc hien') || s.includes('đang thực hiện')) summary.dangThucHien++;
+      else if (s.includes('san sang check') || s.includes('sẵn sàng check')) summary.sanSangCheck++;
+      else if (s.includes('chua bat dau') || s.includes('chưa bắt đầu')) summary.chuaBatDau++;
+
+      // Map Column Q (Feedback)
+      if (task.feedback_status) summary.feedback++;
       
       return task;
     });
@@ -2039,9 +2040,11 @@ async function initDashboard() {
 
     const trends = {
         total: 0,
-        inProgress: 0,
-        done: 0,
-        overdue: 0
+        hoanThanh: 0,
+        dangThucHien: 0,
+        sanSangCheck: 0,
+        chuaBatDau: 0,
+        feedback: 0
     };
 
     normalizedTasks.forEach(t => {
@@ -2049,29 +2052,48 @@ async function initDashboard() {
         const d = new Date(t.date);
         if (isNaN(d) || d < sevenDaysAgo || d > currentDate) return;
 
-        // If activity happened this week
         trends.total++;
         const s = t.status.toLowerCase();
-        if (s.includes('done') || s.includes('hoàn thành') || s.includes('accepted')) {
-            trends.done++;
-        } else if (s.includes('đang') || s.includes('thực hiện') || s.includes('check')) {
-            trends.inProgress++;
-        } else if (s.includes('chưa') || s.includes('bắt đầu')) {
-            trends.overdue++;
-        }
+        if (s.includes('hoan thanh') || s.includes('hoàn thành')) trends.hoanThanh++;
+        else if (s.includes('dang thuc hien') || s.includes('đang thực hiện')) trends.dangThucHien++;
+        else if (s.includes('san sang check') || s.includes('sẵn sàng check')) trends.sanSangCheck++;
+        else if (s.includes('chua bat dau') || s.includes('chưa bắt đầu')) trends.chuaBatDau++;
+
+        if (t.feedback_status) trends.feedback++;
     });
 
-    if(metricValues[0]) metricValues[0].textContent = summary.total;
-    if(metricTrends[0]) metricTrends[0].textContent = `↑ +${trends.total} this week`;
+    // Animation Helper
+    function animateValue(obj, start, end, duration) {
+        if (!obj) return;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.textContent = Math.floor(progress * (end - start) + start);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
 
-    if(metricValues[1]) metricValues[1].textContent = summary.inProgress;
-    if(metricTrends[1]) metricTrends[1].textContent = `↑ +${trends.inProgress} this week`;
+    if(metricValues[0]) animateValue(metricValues[0], 0, summary.total, 1000);
+    if(metricTrends[0]) metricTrends[0].textContent = `+${trends.total} new entries`;
 
-    if(metricValues[2]) metricValues[2].textContent = summary.done;
-    if(metricTrends[2]) metricTrends[2].textContent = `↑ +${trends.done} this week`;
+    if(metricValues[1]) animateValue(metricValues[1], 0, summary.hoanThanh, 1000);
+    if(metricTrends[1]) metricTrends[1].textContent = `+${trends.hoanThanh} new finished`;
 
-    if(metricValues[3]) metricValues[3].textContent = summary.overdue;
-    if(metricTrends[3]) metricTrends[3].textContent = `↑ +${trends.overdue} this week`;
+    if(metricValues[2]) animateValue(metricValues[2], 0, summary.dangThucHien, 1000);
+    if(metricTrends[2]) metricTrends[2].textContent = `+${trends.dangThucHien} new active`;
+
+    if(metricValues[3]) animateValue(metricValues[3], 0, summary.sanSangCheck, 1000);
+    if(metricTrends[3]) metricTrends[3].textContent = `+${trends.sanSangCheck} new check`;
+
+    if(metricValues[4]) animateValue(metricValues[4], 0, summary.chuaBatDau, 1000);
+    if(metricTrends[4]) metricTrends[4].textContent = `+${trends.chuaBatDau} new todo`;
+
+    if(metricValues[5]) animateValue(metricValues[5], 0, summary.feedback, 1000);
+    if(metricTrends[5]) metricTrends[5].textContent = `+${trends.feedback} new feedback`;
 
     // Helper to render table
     function renderTable(data) {
@@ -2106,22 +2128,22 @@ async function initDashboard() {
     const legendItems = document.querySelectorAll('.legend-item span');
     const donutCircles = document.querySelectorAll('.donut-chart circle');
     const circumference = 440; // 2 * PI * 70
-    const todo = summary.total - summary.done - summary.inProgress;
+    const todo = summary.chuaBatDau;
 
     if(legendItems.length >= 3 && summary.total > 0) {
-        const donePct = ((summary.done / summary.total) * 100).toFixed(1);
-        const progPct = ((summary.inProgress / summary.total) * 100).toFixed(1);
-        const waitPct = ((todo / summary.total) * 100).toFixed(1);
+        const donePct = ((summary.hoanThanh / summary.total) * 100).toFixed(1);
+        const progPct = (((summary.dangThucHien + summary.sanSangCheck) / summary.total) * 100).toFixed(1);
+        const waitPct = ((summary.chuaBatDau / summary.total) * 100).toFixed(1);
 
         legendItems[0].textContent = `Done (${donePct}%)`;
         legendItems[1].textContent = `In Progress (${progPct}%)`;
-        legendItems[2].textContent = `Waitting (${waitPct}%)`;
+        legendItems[2].textContent = `To Do (${waitPct}%)`;
     }
 
     if(donutCircles.length >= 3 && summary.total > 0) {
-        const doneLen = (summary.done / summary.total) * circumference;
-        const progLen = (summary.inProgress / summary.total) * circumference;
-        const waitLen = (todo / summary.total) * circumference;
+        const doneLen = (summary.hoanThanh / summary.total) * circumference;
+        const progLen = ((summary.dangThucHien + summary.sanSangCheck) / summary.total) * circumference;
+        const waitLen = (summary.chuaBatDau / summary.total) * circumference;
 
         // Reset and Apply
         donutCircles[0].setAttribute('stroke-dasharray', `${doneLen} ${circumference}`);
@@ -2137,7 +2159,7 @@ async function initDashboard() {
     const donutTotal = document.querySelector('.donut-total');
     const donutLabel = document.querySelector('.donut-label');
     if(donutTotal && summary.total > 0) {
-        const totalDonePct = Math.round((summary.done / summary.total) * 100);
+        const totalDonePct = Math.round((summary.hoanThanh / summary.total) * 100);
         donutTotal.textContent = `${totalDonePct}%`;
     }
     if(donutLabel) {
