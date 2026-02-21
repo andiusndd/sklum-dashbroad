@@ -71,6 +71,7 @@ app.get('/api/data', async (req, res) => {
                         .trim()
                         .replace(/\s+/g, '_')
                         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                        .replace(/[đĐ]/g, m => m === 'đ' ? 'd' : 'D') // Handle Vietnamese 'đ'
                         .replace(/[^a-z0-9_]/g, ''); 
                     obj[key] = row[index] || '';
                 });

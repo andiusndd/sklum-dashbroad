@@ -2008,20 +2008,21 @@ async function initDashboard() {
     const normalizedTasks = tasks.map(t => {
       const task = {
         name: t.model_id || t.sku || t.collection || t.task_name || 'Untitled',
-        status: t.trang_thai || t.status || t.state || 'Unknown',
-        feedback_status: t.giai_doan_feedback || t.feedback || '',
+        status: (t.trang_thai || t.status || t.state || 'Unknown').trim(),
+        feedback_status: (t.giai_doan_feedback || t.feedback || '').trim(),
         progress: t.progress || t.tien_do || t.percent || '0%',
         assignee: t.modeler || t.assignee || t.nguoi_thuc_hien || 'Unassigned',
         date: t.ngay_accepted || t.ngay_gui_l1 || t.due_date || t.han_chot || 'TBD'
       };
 
-      const s = task.status.toLowerCase();
+      // Normalize string for robust comparison: trim, lower, remove accents
+      const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
       
       // Map Column J (Trạng thái)
-      if (s.includes('hoan thanh') || s.includes('hoàn thành')) summary.hoanThanh++;
-      else if (s.includes('dang thuc hien') || s.includes('đang thực hiện')) summary.dangThucHien++;
-      else if (s.includes('san sang check') || s.includes('sẵn sàng check')) summary.sanSangCheck++;
-      else if (s.includes('chua bat dau') || s.includes('chưa bắt đầu')) summary.chuaBatDau++;
+      if (s.includes('hoan thanh')) summary.hoanThanh++;
+      else if (s.includes('dang thuc hien')) summary.dangThucHien++;
+      else if (s.includes('san sang check')) summary.sanSangCheck++;
+      else if (s.includes('chua bat dau')) summary.chuaBatDau++;
 
       // Map Column Q (Feedback)
       if (task.feedback_status) summary.feedback++;
