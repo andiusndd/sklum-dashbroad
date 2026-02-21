@@ -2066,6 +2066,8 @@ async function initDashboard() {
     const diffVN = nowVN.getUTCDate() - dayVN + (dayVN === 0 ? -6 : 1);
     const MondayResetVN = Date.UTC(nowVN.getUTCFullYear(), nowVN.getUTCMonth(), diffVN, 0, 0, 0);
 
+    console.log('Trend Reset (Monday UTC+7 baseline for this week):', new Date(MondayResetVN).toUTCString());
+
     const trends = {
         total: 0,
         hoanThanh: 0,
