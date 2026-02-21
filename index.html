@@ -1403,23 +1403,16 @@
       }
     }
 
-    /* Side Navigation Dots - Fixed Position */
+    /* Side Navigation Dots - Simple & Small */
     .side-nav {
       position: fixed;
-      right: 28px;
+      right: 20px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       z-index: 2000;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 14px 10px;
-      border-radius: 24px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
     /* Hide side nav on mobile */
@@ -1430,27 +1423,24 @@
     }
 
     .nav-dot {
-      width: 12px;
-      height: 12px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: rgba(255, 255, 255, 0.3);
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.3s ease;
       outline: none;
+      border: none;
     }
 
     .nav-dot.active {
       background: #ffffff;
-      transform: scale(1.4);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-      border-color: #ffffff;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #cccccc);
+      transform: scale(1.5);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     }
 
     .nav-dot:hover {
-      background: rgba(255, 255, 255, 0.5);
-      transform: scale(1.2);
+      background: rgba(255, 255, 255, 0.6);
     }
   </style>
 </head>
