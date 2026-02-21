@@ -2041,62 +2041,21 @@ async function initDashboard() {
     const metricValues = document.querySelectorAll('.metric-value');
     const metricTrends = document.querySelectorAll('.metric-trend');
     
-    // --- NEW: Robust UTC+7 (Vietnam Time) Logic ---
-    const VN_OFFSET = 7 * 60 * 60 * 1000;
-
-    function parseDateVN(dateStr) {
-        if (!dateStr || dateStr === 'TBD') return null;
-        let y, m, d;
-        const dmy = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-        if (dmy) {
-            [d, m, y] = [parseInt(dmy[1]), parseInt(dmy[2]), parseInt(dmy[3])];
-        } else {
-            const dt = new Date(dateStr);
-            if (isNaN(dt)) return null;
-            [d, m, y] = [dt.getDate(), dt.getMonth() + 1, dt.getFullYear()];
-        }
-        // Return timestamp representing 00:00:00 on that day in UTC+7
-        return Date.UTC(y, m - 1, d, 0, 0, 0);
-    }
-
-    // Calculate Monday of current week in UTC+7
-    const nowUTC = new Date().getTime();
-    const nowVN = new Date(nowUTC + VN_OFFSET);
-    const dayVN = nowVN.getUTCDay();
-    const diffVN = nowVN.getUTCDate() - dayVN + (dayVN === 0 ? -6 : 1);
-    const MondayResetVN = Date.UTC(nowVN.getUTCFullYear(), nowVN.getUTCMonth(), diffVN, 0, 0, 0);
-
-    console.log('Trend Reset (Monday UTC+7 baseline for this week):', new Date(MondayResetVN).toUTCString());
-
-    const trends = {
-        total: 0,
-        hoanThanh: 0,
-        dangThucHien: 0,
-        sanSangCheck: 0,
-        chuaBatDau: 0,
-        feedback: 0
+    // Trend Calculation: Simple Math (Current - Baseline)
+    // Baselines come from Vercel Env Vars via metadata
+    const bl = metadata.baselines || { 
+        total: 0, hoanThanh: 0, dangThucHien: 0, 
+        sanSangCheck: 0, chuaBatDau: 0, feedback: 0 
     };
 
-    tasks.forEach(t => {
-        const dateStr = t.col_k || t.col_r || t.ngay_doi_trang_thai || t.ngay_accepted || '';
-        const activityTs = parseDateVN(dateStr);
-        
-        // Count activity if it happened on or after Monday 00:00 VN time
-        if (!activityTs || activityTs < MondayResetVN) return;
-
-        trends.total++;
-        
-        const s = (t.col_j || t.trang_thai || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-        if (s.includes('hoan thanh')) trends.hoanThanh++;
-        else if (s.includes('dang thuc hien')) trends.dangThucHien++;
-        else if (s.includes('san sang check')) trends.sanSangCheck++;
-        else if (s.includes('chua bat dau')) trends.chuaBatDau++;
-
-        const f = (t.col_q || t.giai_doan_feedback || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-        if (f.includes('feedback') || (t.col_q && t.col_q.length > 0)) {
-            trends.feedback++;
-        }
-    });
+    const trends = {
+        total: summary.total - bl.total,
+        hoanThanh: summary.hoanThanh - bl.hoanThanh,
+        dangThucHien: summary.dangThucHien - bl.dangThucHien,
+        sanSangCheck: summary.sanSangCheck - bl.sanSangCheck,
+        chuaBatDau: summary.chuaBatDau - bl.chuaBatDau,
+        feedback: summary.feedback - bl.feedback
+    };
 
     // Animation Helper
     function animateValue(obj, start, end, duration) {

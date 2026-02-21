@@ -84,7 +84,23 @@ app.get('/api/data', async (req, res) => {
                 return obj;
             });
 
-        res.json({ data, metadata: { spreadsheet: meta.data.properties.title, sheet: sheetName, sheetId, count: data.length, updatedAt: new Date().toISOString() } });
+        const metadata = {
+            spreadsheet: meta.data.properties.title,
+            sheet: sheetName,
+            sheetId: sheetId,
+            count: data.length,
+            updatedAt: new Date().toISOString(),
+            baselines: {
+                total: parseInt(process.env.BASE_TOTAL || '0'),
+                hoanThanh: parseInt(process.env.BASE_HOAN_THANH || '0'),
+                dangThucHien: parseInt(process.env.BASE_DANG_THUC_HIEN || '0'),
+                sanSangCheck: parseInt(process.env.BASE_SAN_SANG_CHECK || '0'),
+                chuaBatDau: parseInt(process.env.BASE_CHUA_BAT_DAU || '0'),
+                feedback: parseInt(process.env.BASE_FEEDBACK || '0')
+            }
+        };
+
+        res.json({ data, metadata });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
