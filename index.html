@@ -1529,12 +1529,12 @@
               <div class="metric-icon">
                 <img src="https://img.icons8.com/liquid-glass/96/task-completed.png" 
                      onerror="this.src='https://img.icons8.com/fluency/96/checked.png'" 
-                     alt="Hoàn thành" width="48" height="48">
+                     alt="Completed" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Hoàn thành</div>
+                <div class="metric-label">Completed</div>
                 <div class="metric-value">0</div>
-                <div class="metric-trend">0 new</div>
+                <div class="metric-trend">0 finished</div>
               </div>
             </div>
 
@@ -1542,12 +1542,12 @@
               <div class="metric-icon">
                 <img src="https://img.icons8.com/liquid-glass/96/in-progress.png" 
                      onerror="this.src='https://img.icons8.com/fluency/96/synchronize.png'" 
-                     alt="Đang thực hiện" width="48" height="48">
+                     alt="In Progress" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Đang thực hiện</div>
+                <div class="metric-label">In Progress</div>
                 <div class="metric-value">0</div>
-                <div class="metric-trend">0 new</div>
+                <div class="metric-trend">0 active</div>
               </div>
             </div>
 
@@ -1555,12 +1555,12 @@
               <div class="metric-icon">
                 <img src="https://img.icons8.com/liquid-glass/96/search.png" 
                      onerror="this.src='https://img.icons8.com/fluency/96/search.png'" 
-                     alt="Sẵn sàng check" width="48" height="48">
+                     alt="Ready for Review" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Sẵn sàng check</div>
+                <div class="metric-label">Ready for Review</div>
                 <div class="metric-value">0</div>
-                <div class="metric-trend">0 new</div>
+                <div class="metric-trend">0 check</div>
               </div>
             </div>
 
@@ -1568,12 +1568,12 @@
               <div class="metric-icon">
                 <img src="https://img.icons8.com/liquid-glass/96/todo-list.png" 
                      onerror="this.src='https://img.icons8.com/fluency/96/todo-list.png'" 
-                     alt="Chưa bắt đầu" width="48" height="48">
+                     alt="Not Started" width="48" height="48">
               </div>
               <div class="metric-info">
-                <div class="metric-label">Chưa bắt đầu</div>
+                <div class="metric-label">Not Started</div>
                 <div class="metric-value">0</div>
-                <div class="metric-trend">0 new</div>
+                <div class="metric-trend">0 todo</div>
               </div>
             </div>
 
@@ -1675,14 +1675,14 @@
                 <div class="table-controls">
                     <div class="search-wrapper">
                         <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="table-search" class="search-input" placeholder="Search MODEL ID, Assingee...">
+                        <input type="text" id="table-search" class="search-input" placeholder="Search MODEL ID, Assignee...">
                     </div>
                     <select id="status-filter" class="filter-select">
                         <option value="all">All Status</option>
-                        <option value="hoàn thành">Hoàn thành</option>
-                        <option value="đang thực hiện">Đang thực hiện</option>
-                        <option value="sẵn sàng check">Sẵn sàng check</option>
-                        <option value="chưa bắt đầu">Chưa bắt đầu</option>
+                        <option value="completed">Completed</option>
+                        <option value="in progress">In Progress</option>
+                        <option value="ready for review">Ready for Review</option>
+                        <option value="not started">Not Started</option>
                     </select>
                 </div>
             </div>
@@ -1979,13 +1979,22 @@ async function initDashboard() {
         date: (t.col_r || t.ngay_accepted || t.ngay_gui_l1 || t.due_date || 'TBD').trim()
       };
 
-      // Normalize string for robust comparison
+      // Map Status to English for Display
       const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
       
-      if (s.includes('hoan thanh')) summary.hoanThanh++;
-      else if (s.includes('dang thuc hien')) summary.dangThucHien++;
-      else if (s.includes('san sang check')) summary.sanSangCheck++;
-      else if (s.includes('chua bat dau')) summary.chuaBatDau++;
+      if (s.includes('hoan thanh')) {
+          summary.hoanThanh++;
+          task.status = 'Completed';
+      } else if (s.includes('dang thuc hien')) {
+          summary.dangThucHien++;
+          task.status = 'In Progress';
+      } else if (s.includes('san sang check')) {
+          summary.sanSangCheck++;
+          task.status = 'Ready for Review';
+      } else if (s.includes('chua bat dau')) {
+          summary.chuaBatDau++;
+          task.status = 'Not Started';
+      }
 
       // Map Column Q (Feedback) - Checking for any value that might indicate feedback
       // if column name contains feedback, we use it directly.
@@ -2036,22 +2045,22 @@ async function initDashboard() {
     }
 
     if(metricValues[0]) animateValue(metricValues[0], 0, summary.total, 1000);
-    if(metricTrends[0]) metricTrends[0].textContent = `+${trends.total} new entries`;
+    if(metricTrends[0]) metricTrends[0].textContent = `${trends.total >= 0 ? '+' : ''}${trends.total} entries`;
 
     if(metricValues[1]) animateValue(metricValues[1], 0, summary.hoanThanh, 1000);
-    if(metricTrends[1]) metricTrends[1].textContent = `+${trends.hoanThanh} new finished`;
+    if(metricTrends[1]) metricTrends[1].textContent = `${trends.hoanThanh >= 0 ? '+' : ''}${trends.hoanThanh} finished`;
 
     if(metricValues[2]) animateValue(metricValues[2], 0, summary.dangThucHien, 1000);
-    if(metricTrends[2]) metricTrends[2].textContent = `+${trends.dangThucHien} new active`;
+    if(metricTrends[2]) metricTrends[2].textContent = `${trends.dangThucHien >= 0 ? '+' : ''}${trends.dangThucHien} active`;
 
     if(metricValues[3]) animateValue(metricValues[3], 0, summary.sanSangCheck, 1000);
-    if(metricTrends[3]) metricTrends[3].textContent = `+${trends.sanSangCheck} new check`;
+    if(metricTrends[3]) metricTrends[3].textContent = `${trends.sanSangCheck >= 0 ? '+' : ''}${trends.sanSangCheck} check`;
 
     if(metricValues[4]) animateValue(metricValues[4], 0, summary.chuaBatDau, 1000);
-    if(metricTrends[4]) metricTrends[4].textContent = `+${trends.chuaBatDau} new todo`;
+    if(metricTrends[4]) metricTrends[4].textContent = `${trends.chuaBatDau >= 0 ? '+' : ''}${trends.chuaBatDau} todo`;
 
     if(metricValues[5]) animateValue(metricValues[5], 0, summary.feedback, 1000);
-    if(metricTrends[5]) metricTrends[5].textContent = `+${trends.feedback} new feedback`;
+    if(metricTrends[5]) metricTrends[5].textContent = `${trends.feedback >= 0 ? '+' : ''}${trends.feedback} feedback`;
 
     // Helper to render table
     function renderTable(data) {
