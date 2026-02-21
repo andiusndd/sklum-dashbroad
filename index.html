@@ -2041,20 +2041,32 @@ async function initDashboard() {
     const metricValues = document.querySelectorAll('.metric-value');
     const metricTrends = document.querySelectorAll('.metric-trend');
     
-    // Trend Calculation: Simple Math (Current - Baseline)
-    // Baselines come from Vercel Env Vars via metadata
-    const bl = metadata.baselines || { 
-        total: 0, hoanThanh: 0, dangThucHien: 0, 
-        sanSangCheck: 0, chuaBatDau: 0, feedback: 0 
+    // Trend Calculation: Sticky Baselines (Current - Stored Baseline)
+    let baselines = {
+        total: summary.total,
+        hoanThanh: summary.hoanThanh,
+        dangThucHien: summary.dangThucHien,
+        sanSangCheck: summary.sanSangCheck,
+        chuaBatDau: summary.chuaBatDau,
+        feedback: summary.feedback,
+        timestamp: Date.now()
     };
 
+    // Load from localStorage or set initial if missing
+    const storedBaselines = localStorage.getItem('trend_baselines');
+    if (storedBaselines) {
+        baselines = JSON.parse(storedBaselines);
+    } else {
+        localStorage.setItem('trend_baselines', JSON.stringify(baselines));
+    }
+
     const trends = {
-        total: summary.total - bl.total,
-        hoanThanh: summary.hoanThanh - bl.hoanThanh,
-        dangThucHien: summary.dangThucHien - bl.dangThucHien,
-        sanSangCheck: summary.sanSangCheck - bl.sanSangCheck,
-        chuaBatDau: summary.chuaBatDau - bl.chuaBatDau,
-        feedback: summary.feedback - bl.feedback
+        total: summary.total - baselines.total,
+        hoanThanh: summary.hoanThanh - baselines.hoanThanh,
+        dangThucHien: summary.dangThucHien - baselines.dangThucHien,
+        sanSangCheck: summary.sanSangCheck - baselines.sanSangCheck,
+        chuaBatDau: summary.chuaBatDau - baselines.chuaBatDau,
+        feedback: summary.feedback - baselines.feedback
     };
 
     // Animation Helper
@@ -2415,6 +2427,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Reset Trends Baseline Logic
+    const resetTrendsBtn = document.getElementById('reset-trends-btn');
+    if (resetTrendsBtn) {
+        resetTrendsBtn.addEventListener('click', () => {
+            if (confirm('Setup current numbers as the new baseline? All trends (+X/-X) will reset to zero.')) {
+                localStorage.removeItem('trend_baselines');
+                resetTrendsBtn.textContent = '✅ Trends Resetting...';
+                resetTrendsBtn.disabled = true;
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
+    }
+
 });
 </script>
 
@@ -2460,6 +2487,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button id="save-config-btn" class="save-btn">Save</button>
                     </div>
                     <p id="save-status-msg" class="small-text" style="margin-top: 8px; min-height: 14px;"></p>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-num">4</div>
+                <div class="step-info">
+                    <h3>Reset Statistics</h3>
+                    <p>Clear current trends and start tracking changes from this moment:</p>
+                    <button id="reset-trends-btn" class="save-btn" style="background: rgba(255, 68, 68, 0.2); color: #ff6b6b; border: 1px solid rgba(255, 68, 68, 0.3); width: 100%;">Reset Trends Baseline</button>
+                    <p class="small-text" style="margin-top: 8px;">Recommended after major sheet cleanups.</p>
                 </div>
             </div>
         </div>
