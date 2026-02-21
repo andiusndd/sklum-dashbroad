@@ -2025,7 +2025,8 @@ async function initDashboard() {
       else if (s.includes('chua bat dau')) summary.chuaBatDau++;
 
       // Map Column Q (Feedback)
-      if (task.feedback_status) summary.feedback++;
+      const f = task.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+      if (f.includes('feedback')) summary.feedback++;
       
       return task;
     });
@@ -2054,13 +2055,14 @@ async function initDashboard() {
         if (isNaN(d) || d < sevenDaysAgo || d > currentDate) return;
 
         trends.total++;
-        const s = t.status.toLowerCase();
-        if (s.includes('hoan thanh') || s.includes('hoàn thành')) trends.hoanThanh++;
-        else if (s.includes('dang thuc hien') || s.includes('đang thực hiện')) trends.dangThucHien++;
-        else if (s.includes('san sang check') || s.includes('sẵn sàng check')) trends.sanSangCheck++;
-        else if (s.includes('chua bat dau') || s.includes('chưa bắt đầu')) trends.chuaBatDau++;
+        const s = t.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+        if (s.includes('hoan thanh')) trends.hoanThanh++;
+        else if (s.includes('dang thuc hien')) trends.dangThucHien++;
+        else if (s.includes('san sang check')) trends.sanSangCheck++;
+        else if (s.includes('chua bat dau')) trends.chuaBatDau++;
 
-        if (t.feedback_status) trends.feedback++;
+        const f = t.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+        if (f.includes('feedback')) trends.feedback++;
     });
 
     // Animation Helper
