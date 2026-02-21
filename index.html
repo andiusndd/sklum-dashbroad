@@ -2041,10 +2041,24 @@ async function initDashboard() {
     const metricValues = document.querySelectorAll('.metric-value');
     const metricTrends = document.querySelectorAll('.metric-trend');
     
-    // Trend Calculation Logic
+    // --- NEW: Robust Date Parsing for Trends ---
+    function parseDate(dateStr) {
+        if (!dateStr || dateStr === 'TBD') return null;
+        // Handle DD/MM/YYYY or DD-MM-YYYY
+        const dmy = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+        if (dmy) {
+            return new Date(dmy[3], dmy[2] - 1, dmy[1]);
+        }
+        const d = new Date(dateStr);
+        return isNaN(d) ? null : d;
+    }
+
+    // Trend Calculation: Reset per week (starting Monday)
     const currentDate = new Date();
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(currentDate.getDate() - 7);
+    const day = currentDate.getDay(); // 0 (Sun) to 6 (Sat)
+    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1); // Adjust when Sunday
+    const MondayOfThisWeek = new Date(currentDate.setDate(diff));
+    MondayOfThisWeek.setHours(0, 0, 0, 0);
 
     const trends = {
         total: 0,
@@ -2055,20 +2069,25 @@ async function initDashboard() {
         feedback: 0
     };
 
-    normalizedTasks.forEach(t => {
-        if (!t.date || t.date === 'TBD') return;
-        const d = new Date(t.date);
-        if (isNaN(d) || d < sevenDaysAgo || d > currentDate) return;
+    tasks.forEach(t => {
+        // Use col_k (Ngày đổi trạng thái) for trends if available, else fallback
+        const dateStr = t.col_k || t.col_r || t.ngay_doi_trang_thai || t.ngay_accepted || '';
+        const activityDate = parseDate(dateStr);
+        
+        // Only count activity from this week
+        if (!activityDate || activityDate < MondayOfThisWeek) return;
 
         trends.total++;
-        const s = t.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+        
+        // Status checks (normalized)
+        const s = (t.col_j || t.trang_thai || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
         if (s.includes('hoan thanh')) trends.hoanThanh++;
         else if (s.includes('dang thuc hien')) trends.dangThucHien++;
         else if (s.includes('san sang check')) trends.sanSangCheck++;
         else if (s.includes('chua bat dau')) trends.chuaBatDau++;
 
-        const f = t.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-        if (f.includes('feedback') || f.includes('phan hoi') || f.length > 0) {
+        const f = (t.col_q || t.giai_doan_feedback || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
+        if (f.includes('feedback') || (t.col_q && t.col_q.length > 0)) {
             trends.feedback++;
         }
     });
