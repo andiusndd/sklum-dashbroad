@@ -1352,14 +1352,13 @@
     }
 
     @media (max-width: 480px) {
-      /* Keep 2-column grid with square cards */
       .metric-grid {
-        grid-template-columns: repeat(2, 1fr); /* Back to 2 columns for smart scaling */
+        grid-template-columns: repeat(2, 1fr);
         gap: 12px;
       }
 
       .metric-card {
-        aspect-ratio: 1 / 1; /* Square cards */
+        aspect-ratio: 1 / 1; /* Force 1:1 Square */
         padding: 16px;
         flex-direction: column;
         justify-content: center;
@@ -1377,19 +1376,31 @@
         height: 32px;
       }
 
-      .metric-label { 
-        font-size: 9px; 
-        margin-bottom: 4px; 
+      .metric-label { font-size: 9px; margin-bottom: 4px; }
+      .metric-value { font-size: 24px; margin-bottom: 4px; }
+      .metric-trend { font-size: 9px; }
+
+      /* Chart Smart Scaling */
+      .chart-card {
+        aspect-ratio: auto;
+        min-height: 350px;
+        padding: 20px;
       }
 
-      .metric-value { 
-        font-size: 24px; 
-        margin-bottom: 4px; 
+      .donut-content {
+        flex-direction: column;
+        gap: 24px;
       }
 
-      .metric-trend { 
-        font-size: 9px; 
+      .donut-svg-container {
+        width: 200px;
+        height: 200px;
       }
+
+      .bar-chart-container {
+        height: 250px;
+      }
+    }
       
       .container {
         padding: 0 20px;
