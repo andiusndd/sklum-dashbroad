@@ -2005,28 +2005,38 @@ async function initDashboard() {
       feedback: 0
     };
 
-    const normalizedTasks = tasks.map(t => {
+    const normalizedTasks = tasks.map((t, idx) => {
+      // DEBUG: Log keys for the first few items to find the feedback column
+      if (idx < 1) console.log('Task keys:', Object.keys(t));
+
       const task = {
         name: t.model_id || t.sku || t.collection || t.task_name || 'Untitled',
         status: (t.trang_thai || t.status || t.state || 'Unknown').trim(),
-        feedback_status: (t.giai_doan_feedback || t.feedback || '').trim(),
+        // Robust fallback for Feedback column
+        feedback_status: (t.giai_doan_feedback || t.feedback || t.phan_hoi || t.feedback_status || '').trim(),
         progress: t.progress || t.tien_do || t.percent || '0%',
         assignee: t.modeler || t.assignee || t.nguoi_thuc_hien || 'Unassigned',
         date: t.ngay_accepted || t.ngay_gui_l1 || t.due_date || t.han_chot || 'TBD'
       };
 
-      // Normalize string for robust comparison: trim, lower, remove accents
+      // Normalize string for robust comparison
       const s = task.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
       
-      // Map Column J (Trạng thái)
       if (s.includes('hoan thanh')) summary.hoanThanh++;
       else if (s.includes('dang thuc hien')) summary.dangThucHien++;
       else if (s.includes('san sang check')) summary.sanSangCheck++;
       else if (s.includes('chua bat dau')) summary.chuaBatDau++;
 
-      // Map Column Q (Feedback)
+      // Map Column Q (Feedback) - Checking for any value that might indicate feedback
+      // if column name contains feedback, we use it directly.
+      // Searching all keys for 'feedback' or 'phan_hoi' if we haven't found it yet.
+      let hasFeedback = false;
       const f = task.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-      if (f.includes('feedback')) summary.feedback++;
+      if (f.includes('feedback') || f.includes('phan hoi') || f.length > 0) {
+        hasFeedback = true;
+      }
+
+      if (hasFeedback) summary.feedback++;
       
       return task;
     });
@@ -2062,7 +2072,9 @@ async function initDashboard() {
         else if (s.includes('chua bat dau')) trends.chuaBatDau++;
 
         const f = t.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-        if (f.includes('feedback')) trends.feedback++;
+        if (f.includes('feedback') || f.includes('phan hoi') || f.length > 0) {
+            trends.feedback++;
+        }
     });
 
     // Animation Helper
