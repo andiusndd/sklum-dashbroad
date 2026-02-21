@@ -2041,24 +2041,30 @@ async function initDashboard() {
     const metricValues = document.querySelectorAll('.metric-value');
     const metricTrends = document.querySelectorAll('.metric-trend');
     
-    // --- NEW: Robust Date Parsing for Trends ---
-    function parseDate(dateStr) {
+    // --- NEW: Robust UTC+7 (Vietnam Time) Logic ---
+    const VN_OFFSET = 7 * 60 * 60 * 1000;
+
+    function parseDateVN(dateStr) {
         if (!dateStr || dateStr === 'TBD') return null;
-        // Handle DD/MM/YYYY or DD-MM-YYYY
+        let y, m, d;
         const dmy = dateStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
         if (dmy) {
-            return new Date(dmy[3], dmy[2] - 1, dmy[1]);
+            [d, m, y] = [parseInt(dmy[1]), parseInt(dmy[2]), parseInt(dmy[3])];
+        } else {
+            const dt = new Date(dateStr);
+            if (isNaN(dt)) return null;
+            [d, m, y] = [dt.getDate(), dt.getMonth() + 1, dt.getFullYear()];
         }
-        const d = new Date(dateStr);
-        return isNaN(d) ? null : d;
+        // Return timestamp representing 00:00:00 on that day in UTC+7
+        return Date.UTC(y, m - 1, d, 0, 0, 0);
     }
 
-    // Trend Calculation: Reset per week (starting Monday)
-    const currentDate = new Date();
-    const day = currentDate.getDay(); // 0 (Sun) to 6 (Sat)
-    const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1); // Adjust when Sunday
-    const MondayOfThisWeek = new Date(currentDate.setDate(diff));
-    MondayOfThisWeek.setHours(0, 0, 0, 0);
+    // Calculate Monday of current week in UTC+7
+    const nowUTC = new Date().getTime();
+    const nowVN = new Date(nowUTC + VN_OFFSET);
+    const dayVN = nowVN.getUTCDay();
+    const diffVN = nowVN.getUTCDate() - dayVN + (dayVN === 0 ? -6 : 1);
+    const MondayResetVN = Date.UTC(nowVN.getUTCFullYear(), nowVN.getUTCMonth(), diffVN, 0, 0, 0);
 
     const trends = {
         total: 0,
@@ -2070,16 +2076,14 @@ async function initDashboard() {
     };
 
     tasks.forEach(t => {
-        // Use col_k (Ngày đổi trạng thái) for trends if available, else fallback
         const dateStr = t.col_k || t.col_r || t.ngay_doi_trang_thai || t.ngay_accepted || '';
-        const activityDate = parseDate(dateStr);
+        const activityTs = parseDateVN(dateStr);
         
-        // Only count activity from this week
-        if (!activityDate || activityDate < MondayOfThisWeek) return;
+        // Count activity if it happened on or after Monday 00:00 VN time
+        if (!activityTs || activityTs < MondayResetVN) return;
 
         trends.total++;
         
-        // Status checks (normalized)
         const s = (t.col_j || t.trang_thai || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
         if (s.includes('hoan thanh')) trends.hoanThanh++;
         else if (s.includes('dang thuc hien')) trends.dangThucHien++;
