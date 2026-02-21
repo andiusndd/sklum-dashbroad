@@ -2006,17 +2006,13 @@ async function initDashboard() {
     };
 
     const normalizedTasks = tasks.map((t, idx) => {
-      // DEBUG: Log keys for the first few items to find the feedback column
-      if (idx < 1) console.log('Task keys:', Object.keys(t));
-
       const task = {
         name: t.model_id || t.sku || t.collection || t.task_name || 'Untitled',
-        status: (t.trang_thai || t.status || t.state || 'Unknown').trim(),
-        // Robust fallback for Feedback column
-        feedback_status: (t.giai_doan_feedback || t.feedback || t.phan_hoi || t.feedback_status || '').trim(),
+        status: (t.col_j || t.trang_thai || t.status || t.state || 'Unknown').trim(),
+        feedback_status: (t.col_q || t.giai_doan_feedback || t.feedback || t.phan_hoi || '').trim(),
         progress: t.progress || t.tien_do || t.percent || '0%',
         assignee: t.modeler || t.assignee || t.nguoi_thuc_hien || 'Unassigned',
-        date: t.ngay_accepted || t.ngay_gui_l1 || t.due_date || t.han_chot || 'TBD'
+        date: (t.col_r || t.ngay_accepted || t.ngay_gui_l1 || t.due_date || 'TBD').trim()
       };
 
       // Normalize string for robust comparison

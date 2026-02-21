@@ -74,6 +74,9 @@ app.get('/api/data', async (req, res) => {
                         .replace(/[đĐ]/g, m => m === 'đ' ? 'd' : 'D') // Handle Vietnamese 'đ'
                         .replace(/[^a-z0-9_]/g, ''); 
                     obj[key] = row[index] || '';
+                    // Also provide index-based key for absolute mapping (col_a, col_b...)
+                    const colLetter = String.fromCharCode(97 + index); // a, b, c...
+                    if (index < 26) obj[`col_${colLetter}`] = row[index] || '';
                 });
                 return obj;
             });

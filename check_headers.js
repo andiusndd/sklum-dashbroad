@@ -14,10 +14,13 @@ async function checkHeaders() {
     const sheets = google.sheets({ version: 'v4', auth });
 
     const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
-    const firstSheetName = meta.data.sheets[0].properties.title;
+    const targetSheet = meta.data.sheets.find(s => s.properties.title === 'Project Timeline') || meta.data.sheets[0];
+    const sheetName = targetSheet.properties.title;
+    console.log(`Checking Sheet: ${sheetName}`);
+    
     const response = await sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
-        range: `${firstSheetName}!A1:Z1`,
+        range: `${sheetName}!A1:AZ1`,
     });
 
     const headers = response.data.values[0];
