@@ -2001,7 +2001,7 @@ async function initDashboard() {
       // Searching all keys for 'feedback' or 'phan_hoi' if we haven't found it yet.
       let hasFeedback = false;
       const f = task.feedback_status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, 'd');
-      if (f.includes('feedback') || f.includes('phan hoi') || f.length > 0) {
+      if (f === 'feedback') {
         hasFeedback = true;
       }
 
